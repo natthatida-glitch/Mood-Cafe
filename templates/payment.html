@@ -1,0 +1,115 @@
+
+{% extends 'base.html' %}
+
+{% block title %}
+ชำระเงิน | Mood Café
+{% endblock %}
+
+{% block content %}
+
+<section class="checkout-card payment-card">
+
+    <span class="checkout-icon">฿</span>
+
+    <p class="eyebrow">ชำระเงิน / พร้อมเพย์</p>
+
+    <h1>โอนเงินเพื่อยืนยันออร์เดอร์</h1>
+
+    <p>
+        สแกน QR ด้วยแอปธนาคาร แล้วโอนตามยอดด้านล่าง
+        ก่อนยืนยันโปรดตรวจชื่อผู้รับและยอดเงินให้ถูกต้อง
+    </p>
+
+    <div class="checkout-total">
+        <span>ยอดที่ต้องโอน</span>
+
+        <strong>
+            {{ total|number(0) }} <small>บาท · รวม VAT 7%</small>
+        </strong>
+    </div>
+
+    <figure class="payment-qr">
+
+        <img
+            src="{{ qr_url }}"
+            alt="QR พร้อมเพย์สำหรับโอนเงินเข้าร้าน"
+        >
+
+        <figcaption>
+            พร้อมเพย์ · กรุณาตรวจชื่อผู้รับในแอปธนาคารก่อนโอน
+        </figcaption>
+
+    </figure>
+
+    <div class="payment-steps">
+
+        <b>หลังโอนเงินแล้ว</b>
+
+        <span>
+            1. บันทึกภาพสลิปจากแอปธนาคาร
+        </span>
+
+        <span>
+            2. แนบสลิปเพื่อส่งออร์เดอร์ให้ร้านตรวจสอบ
+        </span>
+
+        <small>
+            ร้านจะยืนยันออร์เดอร์หลังตรวจยอดเงินเข้าบัญชีแล้ว
+        </small>
+
+    </div>
+
+    {% if error %}
+    <p class="form-alert" role="alert">
+        {{ error }}
+    </p>
+    {% endif %}
+
+    <form
+        action="{{ url_for('submit_payment') }}"
+        method="post"
+        enctype="multipart/form-data"
+        class="payment-upload-form"
+    >
+
+        <input
+            type="hidden"
+            name="cart_source"
+            value="{{ cart_source|default('menu') }}"
+        >
+
+        <label for="payment_slip">
+            แนบสลิปโอนเงิน
+
+            <small>
+                ไฟล์ PNG, JPG หรือ WEBP ขนาดไม่เกิน 5 MB
+            </small>
+        </label>
+
+        <input
+            id="payment_slip"
+            name="payment_slip"
+            type="file"
+            accept="image/png,image/jpeg,image/webp"
+            required
+        >
+
+        <button
+            class="button button-dark button-wide"
+            type="submit"
+        >
+            ส่งสลิปและยืนยันออร์เดอร์ ↗
+        </button>
+
+    </form>
+
+    <a
+        class="text-link payment-back"
+        href="{{ url_for('view_recommend_cart') if cart_source|default('menu') == 'recommend' else url_for('view_cart') }}"
+    >
+        กลับไปตรวจตะกร้า
+    </a>
+
+</section>
+
+{% endblock %}

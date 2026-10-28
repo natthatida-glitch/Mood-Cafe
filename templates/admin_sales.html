@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block title %}รายงานยอดขาย | จัดการร้าน{% endblock %}
+{% block content %}
+<section class="page-heading compact">
+    <p class="eyebrow">MOOD CAFÉ / SALES</p>
+    <h1>รายงานยอดขาย</h1>
+    <p>ดูรายการออร์เดอร์ที่ชำระแล้ว พร้อมยอดรวมตามช่วงเวลาที่เลือก</p>
+</section>
+{% include '_admin_nav.html' %}
+<section class="admin-section">
+    <form class="admin-report-filter" method="get" action="{{ url_for('admin_sales') }}">
+        <label>ช่วงเวลา
+            <select name="period" data-report-period>
+                <option value="day" {{ 'selected' if period == 'day' else '' }}>รายวัน</option>
+                <option value="month" {{ 'selected' if period == 'month' else '' }}>รายเดือน</option>
+                <option value="year" {{ 'selected' if period == 'year' else '' }}>รายปี</option>
+            </select>
+        </label>
+        <label>วันที่ / เดือน / ปี
+            <input name="value" type="{{ {'day':'date','month':'month','year':'number'}[period] }}" value="{{ value }}" {{ 'min=2000 max=' ~ (current_year + 1) if period == 'year' else '' }} required>
+        </label>
+        <button class="button button-dark button-small" type="submit">ดูยอดขาย</button>
+    </form>
+    <section class="admin-stats admin-report-stats">
+        <article><small>ยอดขาย{{ {'day':'รายวัน','month':'รายเดือน','year':'รายปี'}[period] }} · {{ period_label }}</small><strong>{{ sales_total|number(0) }} ฿</strong></article>
+        <article><small>จำนวนออร์เดอร์ที่ชำระแล้ว</small><strong>{{ sales|length|number(0) }}</strong></article>
+    </section>
+    <div class="admin-section-heading"><div><p class="eyebrow">PAID ORDERS</p><h2>รายการขาย</h2></div></div>
+    {% if sales %}
+    <section class="admin-list">
+        {% for order in sales %}
+        <article class="admin-card">
+            <div class="admin-card-head"><div><span>{{ order.created_at }}</span><h2>ออร์เดอร์ #{{ order.id|number(0) }}</h2></div><span class="status-pill">{{ order.payment_method == 'cash' and 'เงินสดหน้าร้าน' or 'ชำระเงินแล้ว' }}</span></div>
+            {% set customer_label = order.display_customer or 'ลูกค้า' %}
+            <div class="admin-meta"><span>{{ customer_label if customer_label.startswith('คุณ') else 'คุณ' ~ customer_label }}{% if order.customer_phone %} · {{ order.customer_phone }}{% endif %}</span><span>รหัส {{ order.tracking_code or '-' }}</span><strong>{{ (order.total or 0)|number(0) }} ฿</strong><a href="{{ url_for('print_receipt', tracking_code=order.tracking_code) }}" target="_blank" rel="noopener">ดูใบเสร็จ ↗</a></div>
+        </article>
+        {% endfor %}
+    </section>
+    {% else %}<div class="empty-state"><h2>ยังไม่มียอดขายในช่วงนี้</h2><p>เมื่อมีออร์เดอร์ที่ชำระแล้ว รายการจะแสดงที่นี่</p></div>{% endif %}
+</section>
+{% endblock %}

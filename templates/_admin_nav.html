@@ -1,0 +1,27 @@
+<nav class="admin-nav" aria-label="เมนูจัดการร้าน">
+    <a 
+        href="{{ url_for('admin_dashboard') }}" 
+        class="{{ 'is-active' if active_admin_page == 'overview' else '' }}"
+    >
+        ภาพรวมยอดขาย
+    </a>
+
+    <a 
+        href="{{ url_for('admin_menu') }}" 
+        class="{{ 'is-active' if active_admin_page == 'menu' else '' }}"
+    >
+        จัดการเมนู
+    </a>
+
+    <a 
+        href="{{ url_for('admin_orders') }}" 
+        class="{{ 'is-active' if active_admin_page == 'orders' else '' }}"
+    >
+        ติดตามออร์เดอร์
+        {% if pending_order_count %}
+            <span>{{ pending_order_count|number(0) }}</span>
+        {% endif %}
+    </a>
+    <a href="{{ url_for('admin_sales') }}" class="{{ 'is-active' if active_admin_page == 'sales' else '' }}">รายงานยอดขาย</a>
+    <a href="{{ url_for('admin_customers') }}" class="{{ 'is-active' if active_admin_page == 'customers' else '' }}">ข้อมูลลูกค้า</a>
+</nav>

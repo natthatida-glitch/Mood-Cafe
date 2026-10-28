@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mood Café | Admin</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 24px 14px;
+            font-family: Arial, sans-serif;
+            background: #f8f1e7;
+            color: #493629;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+        }
+
+        h1, h2 {
+            color: #79553b;
+        }
+
+        .order-card {
+            background: #fffdf9;
+            padding: 22px;
+            margin: 18px 0;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px #49362912;
+        }
+
+        .status {
+            color: #a34e76;
+            font-weight: bold;
+        }
+
+        select, button {
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #ddc9b5;
+            margin-top: 8px;
+        }
+
+        button {
+            background: #79553b;
+            color: white;
+            cursor: pointer;
+        }
+        
+        .navbar {
+            max-width: 900px;
+            margin: 0 auto 24px;
+            padding: 14px 18px;
+            background: #fffdf9;
+            border-radius: 14px;
+            box-shadow: 0 4px 15px #49362912;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .nav-brand {
+            font-size: 18px;
+            font-weight: bold;
+            color: #79553b;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .nav-links a {
+            display: inline-block;
+            padding: 9px 12px;
+            border-radius: 8px;
+            background: #f3e5d5;
+            color: #493629;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .nav-links a:hover {
+            background: #e8d2bc;
+        }
+
+        .nav-links a.active {
+            background: #79553b;
+            color: white;
+        }
+
+    </style>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+    
+<nav class="navbar">
+    <a href="{{ url_for('home') }}" class="nav-brand"> Mood Café</a>
+
+    <div class="nav-links">
+        <a href="{{ url_for('home') }}">หน้าแรก</a>
+        <a href="{{ url_for('choose') }}">เลือกเครื่องดื่ม</a>
+        <a href="{{ url_for('menu') }}">เมนูเครื่องดื่ม</a>
+        <a href="{{ url_for('view_cart') }}">ตะกร้าสินค้า</a>
+        <a href="{{ url_for('order_history') }}">ประวัติออร์เดอร์</a>
+        <a href="{{ url_for('admin_orders') }}" class="active">จัดการร้าน</a>
+    </div>
+</nav>
+
+<div class="container">
+
+    <h1> Mood Café</h1>
+    <h2>หน้าจัดการออร์เดอร์</h2>
+    <p>รายการสั่งซื้อทั้งหมดของลูกค้าที่รัก </p>
+
+    {% if orders %}
+
+        {% for order in orders %}
+        <div class="order-card">
+
+            <h2>ออร์เดอร์ #{{ order.id|number(0) }}</h2>
+
+            <p>
+                <strong>รหัสติดตาม:</strong>
+                {{ order.tracking_code }}
+            </p>
+
+            <p>
+                <strong>วันที่สั่ง:</strong>
+                {{ order.created_at }}
+            </p>
+
+            <p>
+                <strong>อารมณ์:</strong>
+                {{ order.mood }}
+            </p>
+
+            <p><strong>รายการเครื่องดื่ม:</strong></p>
+
+            <ul>
+                {% for item in order["items"] %}
+                <li>
+                    {{ item.name }} — {{ item.price|number(0) }} บาท
+                </li>
+                {% endfor %}
+            </ul>
+
+            <p>
+                <strong>ยอดรวม:</strong>
+                {{ order.total|number(0) }} บาท
+            </p>
+
+            <p>
+                <strong>สถานะ:</strong>
+                <span class="status">{{ order.status }}</span>
+            </p>
+
+            <form
+                action="{{ url_for('update_status', order_id=order.id) }}"
+                method="POST"
+            >
+                <label>เปลี่ยนสถานะ:</label>
+                <br>
+
+                <select name="status">
+                    <option value="รับออร์เดอร์แล้วค่ะ"
+                        {% if order.status == "รับออร์เดอร์แล้วค่ะ" %}selected{% endif %}>
+                        รับออร์เดอร์แล้ว
+                    </option>
+
+                    <option value="กำลังเตรียมเครื่องดื่มรอแปปน้า"
+                        {% if order.status == "กำลังเตรียมเครื่องดื่มรอแปปน้า" %}selected{% endif %}>
+                        กำลังเตรียมเครื่องดื่ม
+                    </option>
+
+                    <option value="พร้อมรับเครื่องดื่มแล้วค่ะ"
+                        {% if order.status == "พร้อมรับเครื่องดื่มแล้วค่ะ" %}selected{% endif %}>
+                        พร้อมรับเครื่องดื่มแล้ว
+                    </option>
+
+                    <option value="เสร็จสิ้น"
+                        {% if order.status == "เสร็จสิ้น" %}selected{% endif %}>
+                        เสร็จสิ้น
+                    </option>
+                </select>
+
+                <button type="submit">บันทึกสถานะ </button>
+            </form>
+
+        </div>
+        {% endfor %}
+
+    {% else %}
+
+        <p>ยังไม่มีออร์เดอร์ในระบบนะคะ </p>
+
+    {% endif %}
+
+</div>
+</body> 

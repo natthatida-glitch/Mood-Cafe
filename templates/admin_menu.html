@@ -1,0 +1,279 @@
+{% extends 'base.html' %}
+{% block title %}เมนูเครื่องดื่ม | จัดการร้าน{% endblock %}
+{% block content %}
+<section class="page-heading compact">
+    <p class="eyebrow">MOOD CAFÉ / ADMIN</p>
+    <h1>จัดการร้าน</h1>
+    <p>กรอกราคาก่อน VAT และระบบรวม VAT 7%  ดูแลสถานะการขายได้ที่นี่</p>
+</section>
+{% include '_admin_nav.html' %}
+{% if notice %}<div class="admin-notice" role="status">{{ notice }}</div>{% endif %}
+<section id="menu-management" class="admin-section">
+
+    <div class="admin-section-heading">
+        <div>
+            <p class="eyebrow">MENU MANAGEMENT</p>
+            <h2>เมนูเครื่องดื่ม</h2>
+        </div>
+
+        <span data-menu-visible-count>{{ menu_items|length }} รายการ</span>
+    </div>
+
+    <div class="admin-menu-toolbar" aria-label="ค้นหาและกรองเมนู">
+        <label class="admin-menu-search">
+            <span>ค้นหาเมนู</span>
+            <input type="search" placeholder="พิมพ์ชื่อเมนูที่ต้องการหา" data-menu-search>
+        </label>
+        <label>
+            <span>หมวดหมู่</span>
+            <select data-menu-category>
+                <option value="all">ทุกหมวดหมู่</option>
+                {% for code, label in categories.items() %}<option value="{{ code }}">{{ label }}</option>{% endfor %}
+            </select>
+        </label>
+        <label>
+            <span>สถานะ</span>
+            <select data-menu-status><option value="all">ทุกสถานะ</option><option value="active">เปิดขาย</option><option value="inactive">ปิดขาย</option></select>
+        </label>
+    </div>
+
+    <details class="admin-add-form">
+
+        <summary>＋ เพิ่มเมนูใหม่</summary>
+
+        <form
+            action="{{ url_for('admin_add_menu_item') }}"
+            method="post"
+            enctype="multipart/form-data"
+            class="menu-edit-form"
+        >
+
+            <label>
+                ชื่อเมนู
+                <input
+                    name="name"
+                    maxlength="80"
+                    required
+                    placeholder="เช่น ชาไทยครีมชีส"
+                >
+            </label>
+
+            <label>
+                หมวดหมู่
+                <select name="category">
+                    {% for code, label in categories.items() %}
+                    <option value="{{ code }}">
+                        {{ label }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </label>
+
+            <label class="menu-image-upload">
+                รูปประกอบเมนู (JPG, PNG หรือ WEBP ไม่เกิน 5 MB)
+                <input name="image" type="file" accept="image/jpeg,image/png,image/webp">
+            </label>
+
+                <div class="admin-prices">
+                {% for code, label in styles.items() %}
+                <label>
+                    ราคาก่อน VAT · {{ label }}
+                    <input
+                        name="price_{{ code }}"
+                        type="number"
+                        min="1"
+                        max="5000"
+                        placeholder="ไม่เปิดขาย"
+                    >
+                </label>
+                {% endfor %}
+            </div>
+
+            <fieldset>
+                <legend>เหมาะกับอารมณ์</legend>
+
+                {% for code, label in moods.items() %}
+                <label class="check-label">
+                    <input
+                        type="checkbox"
+                        name="moods"
+                        value="{{ code }}"
+                    >
+                    {{ label }}
+                </label>
+                {% endfor %}
+            </fieldset>
+
+            <button class="button button-dark" type="submit">
+                เพิ่มเมนู
+            </button>
+
+        </form>
+
+    </details>
+
+    <div class="admin-menu-list">
+
+        {% for item in menu_items %}
+
+        <details class="admin-menu-card" data-admin-menu-item data-name="{{ item.name|lower }}" data-category="{{ item.category }}" data-status="{{ 'active' if item.active else 'inactive' }}">
+
+            <summary>
+
+                <span class="menu-photo admin-menu-photo">
+                    <span class="menu-photo-fallback">MENU</span>
+
+                    <img
+                        src="{{ menu_image_urls.get(item.name) or url_for('static', filename='images/menu/' ~ menu_image_keys.get(item.name, 'menu-default') ~ '.jpg', v='menu-set-20261014-userphotos') }}"
+                        alt="{{ item.name }}"
+                        loading="lazy"
+                        onerror="this.remove()"
+                        onload="this.parentElement.classList.add('has-image')"
+                    >
+                </span>
+
+                <span class="admin-menu-card-info">
+                    <span class="admin-menu-card-meta">
+                        <span>{{ categories[item.category] }}</span>
+                        <span class="menu-state {% if item.active %}is-active{% endif %}">{{ 'เปิดขาย' if item.active else 'ปิดขาย' }}</span>
+                    </span>
+                    <span class="admin-menu-name">{{ item.name }}</span>
+                    <span class="admin-menu-price">เริ่ม {{ (item.sale_prices.values()|min)|number(0) }} ฿ <small>รวม VAT 7%</small></span>
+                    <span class="admin-menu-edit-hint">แก้ไขรายละเอียด <span aria-hidden="true">⌄</span></span>
+                </span>
+
+            </summary>
+
+            <form
+                action="{{ url_for('admin_update_menu_item', item_id=item.id) }}"
+                method="post"
+                enctype="multipart/form-data"
+                class="menu-edit-form"
+            >
+
+                <label>
+                    ชื่อเมนู
+                    <input
+                        name="name"
+                        maxlength="80"
+                        required
+                        value="{{ item.name }}"
+                    >
+                </label>
+
+                <label>
+                    หมวดหมู่
+                    <select name="category">
+                        {% for code, label in categories.items() %}
+                        <option
+                            value="{{ code }}"
+                            {% if item.category == code %}selected{% endif %}
+                        >
+                            {{ label }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </label>
+
+                <label class="menu-image-upload">
+                    เปลี่ยนรูปเมนู (เว้นว่างไว้เพื่อใช้รูปเดิม)
+                    <input name="image" type="file" accept="image/jpeg,image/png,image/webp">
+                </label>
+                {% if item.image_filename %}
+                <div class="menu-image-current">
+                    <img src="{{ menu_image_urls.get(item.name) }}" alt="รูปปัจจุบันของ {{ item.name }}">
+                    <span>รูปปัจจุบัน</span>
+                </div>
+                {% endif %}
+
+                <div class="admin-prices">
+                    {% for code, label in styles.items() %}
+                    <label>
+                        ราคาก่อน VAT · {{ label }}
+                        <input
+                            name="price_{{ code }}"
+                            type="number"
+                            min="1"
+                            max="5000"
+                            value="{{ item.prices.get(code, '') }}"
+                            placeholder="ไม่เปิดขาย"
+                        >
+                    </label>
+                    {% endfor %}
+                </div>
+
+                <fieldset>
+                    <legend>เหมาะกับอารมณ์</legend>
+
+                    {% for code, label in moods.items() %}
+                    <label class="check-label">
+                        <input
+                            type="checkbox"
+                            name="moods"
+                            value="{{ code }}"
+                            {% if code in item.moods %}checked{% endif %}
+                        >
+                        {{ label }}
+                    </label>
+                    {% endfor %}
+                </fieldset>
+
+                <div class="admin-form-actions">
+                    <button
+                        class="button button-dark button-small"
+                        type="submit"
+                    >
+                        บันทึกเมนู
+                    </button>
+                </div>
+
+            </form>
+
+            <div class="admin-menu-actions">
+                <form action="{{ url_for('admin_toggle_menu_item', item_id=item.id) }}" method="post" class="menu-toggle-form">
+                    <button class="button button-small {% if item.active %}button-outline{% else %}button-dark{% endif %}" type="submit">{{ 'ปิดการขายเมนูนี้' if item.active else 'เปิดขายเมนูนี้' }}</button>
+                </form>
+                <form action="{{ url_for('admin_delete_menu_item', item_id=item.id) }}" method="post" class="menu-delete-form" onsubmit="return confirm('ลบเมนู {{ item.name }} ออกจากระบบถาวรใช่ไหม? การลบนี้ย้อนกลับไม่ได้')">
+                    <button class="button button-small button-danger" type="submit">ลบเมนู</button>
+                </form>
+            </div>
+
+        </details>
+
+        {% endfor %}
+
+    </div>
+
+    <p class="admin-menu-no-results" data-menu-empty hidden>ไม่พบเมนูที่ตรงกับคำค้นหานี้</p>
+
+</section>
+
+<script>
+(() => {
+    const search = document.querySelector('[data-menu-search]');
+    const category = document.querySelector('[data-menu-category]');
+    const status = document.querySelector('[data-menu-status]');
+    const cards = [...document.querySelectorAll('[data-admin-menu-item]')];
+    const count = document.querySelector('[data-menu-visible-count]');
+    const empty = document.querySelector('[data-menu-empty]');
+    if (!search || !category || !status || !count || !empty) return;
+    const filter = () => {
+        const query = search.value.trim().toLocaleLowerCase('th');
+        let visible = 0;
+        cards.forEach((card) => {
+            const matches = card.dataset.name.includes(query)
+                && (category.value === 'all' || card.dataset.category === category.value)
+                && (status.value === 'all' || card.dataset.status === status.value);
+            card.hidden = !matches;
+            if (matches) visible += 1;
+        });
+        count.textContent = `${visible.toLocaleString('th-TH')} รายการ`;
+        empty.hidden = visible !== 0;
+    };
+    search.addEventListener('input', filter);
+    category.addEventListener('change', filter);
+    status.addEventListener('change', filter);
+})();
+</script>
+
+{% endblock %}
