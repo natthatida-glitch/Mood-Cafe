@@ -10,7 +10,7 @@
 
 ## ตั้งค่าการส่งรหัสกู้รหัสผ่านทาง Gmail
 
-1. เปิดการยืนยันแบบ 2 ขั้นตอนในบัญชี Google `nattatidahotarat@gmail.com`
+1. เปิดการยืนยันแบบ 2 ขั้นตอนในบัญชี Google `your-email@gmail.com`
 2. สร้าง App Password สำหรับแอป Mood Café จากการตั้งค่าความปลอดภัยของ Google
 3. คัดลอก `.env.example` เป็น `.env` ในโฟลเดอร์นี้ แล้วใส่ App Password ใน `MOOD_CAFE_SMTP_PASSWORD` (ไม่ใช่รหัสผ่าน Gmail ปกติ)
 4. ปิดแล้วเปิด `python app.py` ใหม่ จากนั้นลูกค้ากด “ลืมรหัสผ่าน?” ที่หน้าเข้าสู่ระบบ
