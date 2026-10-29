@@ -1,0 +1,128 @@
+
+{% extends 'base.html' %}
+
+{% block title %}
+ประวัติคำสั่งซื้อ| Mood Café
+{% endblock %}
+
+{% block content %}
+
+<section class="page-heading compact">
+
+    <p class="eyebrow">ORDER HISTORY</p>
+
+    <h1>
+        ประวัติคำสั่งซื้อ<br>
+        <em>ของฉัน</em>
+    </h1>
+
+    <p>รายการที่คุณเคยสั่งซื้อและสถานะของแต่ละคำสั่งซื้อ</p>
+
+</section>
+
+{% if orders %}
+
+<section class="history-list">
+
+    {% for order in orders %}
+
+    <article class="history-card">
+
+        <div class="history-heading">
+
+            <div>
+                <span>{{ order.created_at }}</span>
+                <h2>ออร์เดอร์ #{{ order.id|number(0) }}</h2>
+            </div>
+
+            <span class="status-pill">
+                {{ order.status or 'รับออร์เดอร์แล้วค่ะ' }}
+            </span>
+
+        </div>
+
+        <div class="history-items">
+
+            {% for item in order["items"] %}
+
+            <div>
+
+                <span class="menu-photo menu-photo-thumb">
+
+                    <span class="menu-photo-fallback">MENU</span>
+
+                    <img
+                        src="{{ menu_image_urls.get(item.name) or url_for('static', filename='images/menu/' ~ menu_image_keys.get(item.name, 'menu-default') ~ '.jpg', v='menu-set-20261014-userphotos') }}"
+                        alt="{{ item.name }}"
+                        loading="lazy"
+                        onerror="this.remove()"
+                        onload="this.parentElement.classList.add('has-image')"
+                    >
+
+                </span>
+
+                <span>
+                    {{ item.name }}
+                    <small>× {{ item.quantity|number(0) }}</small>
+                </span>
+
+                <span>
+                    {{ (item.price * item.quantity)|number(0) }} ฿
+                </span>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+        <div class="history-footer">
+
+            <span>
+                รหัส {{ order.tracking_code or '-' }}
+                · รวม {{ order.total|number(0) }} ฿
+            </span>
+
+            {% if order.tracking_code %}
+
+            <a href="{{ url_for('track_order', code=order.tracking_code) }}">
+                ติดตาม ↗
+            </a>
+
+            <a href="{{ url_for('print_receipt', tracking_code=order.tracking_code) }}">
+                ดูใบเสร็จ
+            </a>
+
+            <a href="{{ url_for('download_receipt_pdf', tracking_code=order.tracking_code) }}">
+                ดาวน์โหลด PDF
+            </a>
+
+            {% endif %}
+
+        </div>
+
+    </article>
+
+    {% endfor %}
+
+</section>
+
+{% else %}
+
+<div class="empty-state">
+
+    <span class="decorative-mark" aria-hidden="true"></span>
+
+    <h2>ยังไม่มีออร์เดอร์</h2>
+
+    <p>ออร์เดอร์แรกของคุณเริ่มได้จากเมนูที่ชอบ</p>
+
+    <a class="button button-dark" href="{{ url_for('menu') }}">
+        ไปที่เมนู ↗
+    </a>
+
+</div>
+
+{% endif %}
+
+{% endblock %}

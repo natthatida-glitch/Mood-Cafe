@@ -1,0 +1,264 @@
+{% extends 'base.html' %}
+{% block title %}ติดตามออร์เดอร์ | จัดการร้าน{% endblock %}
+{% block content %}
+<section class="page-heading compact">
+    <p class="eyebrow">MOOD CAFÉ / ADMIN</p>
+    <h1>จัดการร้าน</h1>
+    <p>เลือกดูแลเมนูเครื่องดื่ม หรือติดตามออร์เดอร์</p>
+</section>
+{% include '_admin_nav.html' %}
+{% if notice %}<div class="admin-notice" role="status">{{ notice }}</div>{% endif %}
+<section
+    class="admin-section"
+    data-admin-order-watch="{{ admin_orders_signature }}"
+>
+
+    <div class="admin-section-heading">
+
+        <div>
+            <p class="eyebrow">ORDER MANAGEMENT</p>
+            <h2>ออร์เดอร์ล่าสุด</h2>
+        </div>
+
+        <span>{{ orders|length }} รายการ</span>
+
+        <span
+            class="admin-live-status"
+            data-admin-refresh-status
+            aria-live="polite"
+        >
+            Live · อัปเดตอัตโนมัติ
+        </span>
+
+    </div>
+
+    {% if orders %}
+
+    <section class="admin-list">
+
+        {% for order in orders %}
+
+        <article class="admin-card">
+
+            <div class="admin-card-head">
+
+                <div>
+                    <span>{{ order.created_at }}</span>
+                    <h2>ออร์เดอร์ #{{ order.id|number(0) }}</h2>
+                </div>
+
+                <span class="status-pill">
+                    {{ order.status }}
+                </span>
+
+            </div>
+
+            <div class="history-items">
+
+                {% for item in order["items"] %}
+
+                {% set qty = item.get('quantity', 1) %}
+                {% set price = item.get('price', 0) %}
+
+                <div>
+                    <span>
+                        {{ item.get('emoji', '') }}
+                        {{ item.get('name', 'เมนู') }}
+                        × {{ qty|number(0) }}
+                        · {{ item.get('style_name', '-') }}
+                        · {{ item.get('sweet', '-') }}
+                    </span>
+
+                    <strong>
+                        {{ (price * qty)|number(0) }} ฿
+                    </strong>
+                </div>
+
+                {% endfor %}
+
+            </div>
+
+            <div class="admin-meta">
+
+                <span>
+                    อารมณ์: {{ order.mood or '-' }}
+                </span>
+
+                <span>
+                    รหัสติดตาม: {{ order.tracking_code or '-' }}
+                </span>
+
+                <strong>
+                    รวม {{ (order.total or 0)|number(0) }} ฿
+                </strong>
+
+                {% if order.tracking_code and order.payment_status == 'paid' %}
+                <a
+                    href="{{ url_for('print_receipt', tracking_code=order.tracking_code) }}"
+                    target="_blank"
+                    rel="noopener"
+                >
+                    ดูใบเสร็จ PDF ↗
+                </a>
+                {% endif %}
+
+            </div>
+
+            {% if order.note %}
+            <p class="order-note">
+                โน้ต: {{ order.note }}
+            </p>
+            {% endif %}
+
+            {% if order.payment_slip_path %}
+
+            <div class="payment-review">
+
+                <div class="payment-review-heading">
+
+                    <strong>
+                        สลิป ·
+                        {% if order.payment_status == 'pending' %}
+                            รอตรวจสอบ
+                        {% elif order.payment_status == 'paid' %}
+                            ยืนยันรับเงินแล้ว
+                        {% else %}
+                            ปฏิเสธสลิปแล้ว
+                        {% endif %}
+                    </strong>
+
+                    <a
+                        href="{{ url_for('admin_payment_slip', filename=order.payment_slip_path) }}"
+                        target="_blank"
+                        rel="noopener"
+                    >
+                        เปิดภาพเต็ม ↗
+                    </a>
+
+                </div>
+
+                <a
+                    href="{{ url_for('admin_payment_slip', filename=order.payment_slip_path) }}"
+                    target="_blank"
+                    rel="noopener"
+                >
+                    <img
+                        class="payment-slip-preview"
+                        src="{{ url_for('admin_payment_slip_image', filename=order.payment_slip_path) }}"
+                        alt="สลิปโอนเงินของออร์เดอร์ {{ order.id|number(0) }}"
+                    >
+                </a>
+
+                {% if order.payment_status == 'pending' %}
+
+                <p>
+                    โปรดตรวจรายการเงินเข้าบัญชีจริงก่อนยืนยันสลิป
+                </p>
+
+                <form
+                    action="{{ url_for('admin_review_payment', order_id=order.id) }}"
+                    method="post"
+                    class="payment-review-actions"
+                >
+
+                    <button
+                        class="button button-small button-dark"
+                        type="submit"
+                        name="decision"
+                        value="paid"
+                    >
+                        ยืนยันว่าเงินเข้าแล้ว
+                    </button>
+
+                    <button
+                        class="button button-small button-outline"
+                        type="submit"
+                        name="decision"
+                        value="rejected"
+                    >
+                        ปฏิเสธสลิป
+                    </button>
+
+                </form>
+
+                {% endif %}
+
+            </div>
+
+            {% endif %}
+
+            {% if order.payment_status == 'paid' %}
+
+            <form
+                class="status-form"
+                action="{{ url_for('update_status', order_id=order.id) }}"
+                method="post"
+            >
+
+                <label for="status-{{ order.id }}">
+                    สถานะออร์เดอร์
+                </label>
+
+                <select id="status-{{ order.id }}" name="status">
+
+                    <option
+                        {% if order.status == 'รับออร์เดอร์แล้วค่ะ' %}selected{% endif %}
+                    >
+                        รับออร์เดอร์แล้วค่ะ
+                    </option>
+
+                    <option
+                        {% if order.status == 'กำลังเตรียมเครื่องดื่มรอแปปน้า' %}selected{% endif %}
+                    >
+                        กำลังเตรียมเครื่องดื่มรอแปปน้า
+                    </option>
+
+                    <option
+                        {% if order.status == 'พร้อมรับเครื่องดื่มแล้วค่ะ' %}selected{% endif %}
+                    >
+                        พร้อมรับเครื่องดื่มแล้วค่ะ
+                    </option>
+
+                    <option
+                        {% if order.status == 'เสร็จสิ้น' %}selected{% endif %}
+                    >
+                        เสร็จสิ้น
+                    </option>
+
+                </select>
+
+                <button
+                    class="button button-small button-dark"
+                    type="submit"
+                >
+                    บันทึกสถานะ
+                </button>
+
+            </form>
+
+            {% endif %}
+
+        </article>
+
+        {% endfor %}
+
+    </section>
+
+    {% else %}
+
+    <div class="empty-state">
+
+        <span class="decorative-mark" aria-hidden="true"></span>
+
+        <h2>ยังไม่มีออร์เดอร์</h2>
+
+        <p>คำสั่งซื้อใหม่จะแสดงตรงนี้</p>
+
+    </div>
+
+    {% endif %}
+
+</section>
+
+{% endblock %}
+

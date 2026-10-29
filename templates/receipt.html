@@ -1,0 +1,452 @@
+
+<!doctype html>
+<html lang="th">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <title>ใบเสร็จ {{ receipt_number }} | Mood Café</title>
+
+    <style>
+        @page {
+            size: 80mm {{ receipt_page_height_mm }}mm;
+            margin: 0;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #eee8df;
+            color: #29231f;
+            font-family: "Anuphan", "Leelawadee UI", Tahoma, sans-serif;
+            font-size: 12px;
+            line-height: 1.45;
+        }
+
+        .receipt {
+            width: 80mm;
+            max-width: 100%;
+            margin: 24px auto 12px;
+            padding: 6mm 5mm;
+            background: #fffdf9;
+            box-shadow: 0 6px 24px #33261c22;
+        }
+
+        .shop {
+            text-align: center;
+            border-bottom: 1px dashed #a99b8a;
+            padding-bottom: 10px;
+            margin-bottom: 9px;
+        }
+
+        .logo {
+            display: block;
+            width: 34mm;
+            max-width: 100%;
+            max-height: 16mm;
+            height: auto;
+            margin: 0 auto;
+            object-fit: contain;
+        }
+
+        .shop h1 {
+            font-size: 18px;
+            margin: 3px 0 0;
+            letter-spacing: 0.08em;
+        }
+
+        .shop p {
+            font-size: 10px;
+            color: #70645a;
+            margin: 0;
+        }
+
+        .receipt-title {
+            text-align: center;
+            font-weight: 700;
+            margin: 9px 0 5px;
+            font-size: 13px;
+        }
+
+        .meta {
+            font-size: 10px;
+        }
+
+        .meta-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .meta-row span:last-child {
+            text-align: right;
+        }
+
+        .items {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0 7px;
+        }
+
+        .items th {
+            font-size: 9px;
+            color: #65574d;
+            border-bottom: 1px solid #b6a999;
+            padding: 4px 2px;
+        }
+
+        .items td {
+            vertical-align: top;
+            padding: 5px 2px;
+            border-bottom: 1px dotted #d6cec5;
+            font-size: 10px;
+        }
+
+        .items th:nth-child(2),
+        .items td:nth-child(2) {
+            text-align: center;
+            width: 12%;
+        }
+
+        .items th:last-child,
+        .items td:last-child {
+            text-align: right;
+            white-space: nowrap;
+        }
+
+        .sub {
+            display: block;
+            color: #766a61;
+            font-size: 9px;
+        }
+
+        .totals {
+            border-top: 1px dashed #a99b8a;
+            padding-top: 6px;
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+        }
+
+        .grand {
+            font-weight: 800;
+            font-size: 14px;
+            border-top: 1px solid #796d62;
+            margin-top: 5px;
+            padding-top: 5px;
+        }
+
+        .payment {
+            margin-top: 8px;
+            padding-top: 6px;
+            border-top: 1px dashed #a99b8a;
+            font-size: 10px;
+        }
+
+        .note {
+            font-size: 10px;
+            margin: 8px 0 0;
+            padding-top: 6px;
+            border-top: 1px dotted #d6cec5;
+            overflow-wrap: anywhere;
+        }
+
+        .thanks {
+            text-align: center;
+            margin-top: 12px;
+            padding-top: 8px;
+            border-top: 1px dashed #a99b8a;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .thanks small {
+            display: block;
+            font-weight: 400;
+            color: #766a61;
+        }
+
+        .actions {
+            width: 80mm;
+            max-width: 100%;
+            margin: 0 auto 24px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .actions a,
+        .actions button {
+            flex: 1;
+            text-align: center;
+            border: 0;
+            border-radius: 8px;
+            padding: 10px 6px;
+            background: #29231f;
+            color: white;
+            font: inherit;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .actions .download {
+            background: #8b4c3c;
+        }
+
+        .actions .back {
+            flex: 0 0 58px;
+            border: 1px solid #d7c6b5;
+            background: #fffaf4;
+            color: #55443a;
+            font-weight: 800;
+        }
+
+        .pdf-mode body {
+            background: white;
+        }
+
+        .pdf-mode .receipt {
+            margin: 0 auto;
+            box-shadow: none;
+        }
+
+        .pdf-mode .actions {
+            display: none;
+        }
+
+        @media print {
+            body {
+                background: white;
+            }
+
+            .receipt {
+                margin: 0 auto;
+                box-shadow: none;
+                padding: 4mm;
+            }
+
+            .actions {
+                display: none;
+            }
+
+        }
+    </style>
+</head>
+
+<body class="{% if pdf_mode %}pdf-mode{% endif %}">
+
+    <main class="receipt">
+
+        <header class="shop">
+
+            <img
+                class="logo"
+                src="{{ logo_data_uri }}"
+                alt="Mood Café"
+            >
+
+            <p>ใบเสร็จรับเงิน</p>
+
+        </header>
+
+        <div class="receipt-title">
+            ใบเสร็จ / RECEIPT
+        </div>
+
+        <div class="meta">
+
+            <div class="meta-row">
+                <span>เลขที่ใบเสร็จ</span>
+                <span>{{ receipt_number }}</span>
+            </div>
+
+            <div class="meta-row">
+                <span>เลขคำสั่งซื้อ</span>
+                <span>
+                    #{{ order.id|number(0) }} · {{ order.tracking_code }}
+                </span>
+            </div>
+
+            <div class="meta-row">
+                <span>วันที่และเวลา</span>
+                <span>{{ order.created_at or '-' }}</span>
+            </div>
+
+            <div class="meta-row">
+                <span>ชื่อลูกค้า</span>
+                <span>{{ customer_name }}</span>
+            </div>
+
+        </div>
+
+        <table class="items">
+
+            <thead>
+                <tr>
+                    <th style="text-align: left;">
+                        รายการ / รูปแบบ
+                    </th>
+
+                    <th>จำนวน</th>
+
+                    <th>ราคา</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for item in order['items'] %}
+
+                <tr>
+
+                    <td>
+                        {{ item.get('name', 'เครื่องดื่ม') }}
+
+                        <span class="sub">
+                            {{ item.get('style_name', '-') }}
+
+                            {% if item.get('sweet') %}
+                                · หวาน {{ item.get('sweet') }}
+                            {% endif %}
+
+                            {% if item.get('ice_separate') %}
+                                · แยกน้ำแข็ง
+                            {% endif %}
+                        </span>
+                    </td>
+
+                    <td>
+                        {{ item.get('quantity', 1)|number(0) }}
+                    </td>
+
+                    <td>
+                        {{ (item.get('price', 0) * item.get('quantity', 1))|number(0) }}
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+        <section class="totals">
+
+            <div class="total-row">
+                <span>ยอดสินค้า (รวม VAT)</span>
+                <span>{{ subtotal|number(0) }} ฿</span>
+            </div>
+
+            <div class="total-row">
+                <span>ส่วนลด</span>
+                <span>- {{ discount|number(0) }} ฿</span>
+            </div>
+
+            <div class="total-row">
+                <span>ค่าจัดส่ง</span>
+                <span>{{ shipping|number(0) }} ฿</span>
+            </div>
+
+            <div class="total-row">
+                <span>ภาษีมูลค่าเพิ่ม (VAT 7%)</span>
+                <span>{{ vat|number(2) }} ฿</span>
+            </div>
+
+            <div class="total-row grand">
+                <span>ยอดรวมสุทธิ</span>
+                <span>{{ receipt_total|number(0) }} ฿</span>
+            </div>
+
+            {% if order.payment_method == 'loyalty_reward' %}
+            <div class="reward-receipt-note">แลกสิทธิ์เครื่องดื่มฟรีจากแต้มสะสม</div>
+            {% endif %}
+
+        </section>
+
+        <section class="payment">
+
+            <div class="meta-row">
+                <span>วิธีชำระเงิน</span>
+                <span>{{ payment_method }}</span>
+            </div>
+
+            <div class="meta-row payment-status">
+                <span>สถานะ</span>
+                <strong>{{ payment_status_label }}</strong>
+            </div>
+            {% if cash_received is not none %}
+            <div class="meta-row">
+                <span>รับเงินสด</span>
+                <span>{{ cash_received|number(0) }} ฿</span>
+            </div>
+            <div class="meta-row">
+                <span>เงินทอน</span>
+                <strong>{{ change_given|number(0) }} ฿</strong>
+            </div>
+            {% endif %}
+
+        </section>
+
+        {% if order.note %}
+        <p class="note">
+            <b>หมายเหตุจากลูกค้า:</b>
+            {{ order.note }}
+        </p>
+        {% endif %}
+
+        <footer class="thanks">
+            Thank you for choosing Mood Cafe
+
+            <small>
+                ขอบคุณที่อุดหนุน แล้วพบกันใหม่นะคะ
+            </small>
+        </footer>
+
+    </main>
+
+    {% if not pdf_mode %}
+
+    <nav class="actions">
+
+        <a class="back" href="{{ back_url }}">
+            กลับ
+        </a>
+
+        <button
+            type="button"
+            onclick="window.print()"
+        >
+            พิมพ์ใบเสร็จ
+        </button>
+
+        <a
+            class="download"
+            href="{{ url_for('download_receipt_pdf', tracking_code=order.tracking_code) }}"
+        >
+            ดาวน์โหลดใบเสร็จ
+        </a>
+
+    </nav>
+
+    {% endif %}
+
+    {% if auto_print %}
+    <script>
+        window.addEventListener("load", () => window.print());
+    </script>
+    {% endif %}
+
+</body>
+
+</html>
+

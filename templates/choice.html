@@ -1,0 +1,72 @@
+
+{% extends 'base.html' %}
+
+{% block title %}
+เลือกทางของคุณ | Mood Café
+{% endblock %}
+
+{% block content %}
+
+<section class="page-heading">
+
+    <p class="eyebrow">
+        HELLO, {{ session.get('username', 'FRIEND') }}
+    </p>
+
+    <h1>
+        วันนี้อยากเริ่ม<br>
+        <em>จากตรงไหนดีคะ?</em>
+    </h1>
+
+    <p>เลือกวิธีสั่งซื้อที่คุณต้องการได้เลยค่ะคุณลูกค้าที่รักของเรา</p>
+
+</section>
+
+<section class="choice-grid">
+
+    <a
+        class="choice-tile choice-tile-accent"
+        href="{{ url_for('recommend_form') }}"
+    >
+        <span>01 / FEEL</span>
+
+        <b>01</b>
+
+        <h2>ไม่รู้จะกินอะไรให้เราแนะนำสิ</h2>
+
+        <p>
+            เพียงแค่บอกอารมณ์ งบ และระดับความหวานที่ชอบ
+            เราจะหาเมนูที่เข้ากับคุณเองค่ะ
+        </p>
+
+        <strong>
+            เลือกตามความรู้สึก <i>↗</i>
+        </strong>
+    </a>
+
+    <a
+        class="choice-tile"
+        href="{{ url_for('menu') }}"
+    >
+        <span>02 / MENU</span>
+
+        <b>02</b>
+
+        <h2>วันนี้อยากกินสิ่งนี้จัง กดเลย!!</h2>
+
+        <p>
+            เลือกดูทุกเมนูตามใจตัวเองได้เลยค่ะ
+        </p>
+
+        <strong>
+            ไปที่เมนู <i>↗</i>
+        </strong>
+    </a>
+
+</section>
+
+<p class="center-note">
+    ไม่ต้องรีบเลือกจ้า ค่อย ๆ หาเครื่องดื่มอร่อยสุดแสนจะบรรยายที่เหมาะกับคุณในวันนี้
+</p>
+
+{% endblock %}

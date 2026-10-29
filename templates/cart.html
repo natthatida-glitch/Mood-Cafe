@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+
+{% block title %}
+ตะกร้าของฉัน | Mood Café
+{% endblock %}
+
+{% block content %}
+
+<section class="page-heading compact">
+    <p class="eyebrow">YOUR SELECTION</p>
+    <h1>แก้วที่เลือกไว้</h1>
+    <p>ตรวจรายการและจำนวนก่อนยืนยันออร์เดอร์</p>
+</section>
+
+<section class="cart-layout">
+
+    <div class="cart-list">
+
+        {% if cart %}
+
+            {% for item in cart %}
+
+            <article class="cart-item">
+
+                <div class="menu-photo">
+                    <span class="menu-photo-fallback">
+                        {{ item.get('category', 'MENU') }}
+                    </span>
+
+                    <img
+                        src="{{ menu_image_urls.get(item.name) or url_for('static', filename='images/menu/' ~ menu_image_keys.get(item.name, 'menu-default') ~ '.jpg', v='menu-set-20261014-userphotos') }}"
+                        alt="{{ item.name }}"
+                        loading="lazy"
+                        onerror="this.remove()"
+                        onload="this.parentElement.classList.add('has-image')"
+                    >
+                </div>
+
+                <div class="cart-item-info">
+                    <h2>{{ item.name }}</h2>
+
+                    <p>
+                        {{ item.style_name }} · {{ item.sweet }}
+                        {% if item.ice_separate %}
+                            · แยกน้ำแข็ง
+                        {% endif %}
+                    </p>
+
+                    <span class="cart-line-total">
+                        {{ (item.price * item.quantity)|number(0) }} ฿
+                    </span>
+                </div>
+
+                <div class="cart-quantity">
+
+                    <button
+                        type="button"
+                        data-cart-action="decrease"
+                        data-cart-source="menu"
+                        data-index="{{ loop.index0 }}"
+                        aria-label="ลดจำนวน"
+                    >
+                        −
+                    </button>
+
+                    <span>{{ item.quantity|number(0) }}</span>
+
+                    <button
+                        type="button"
+                        data-cart-action="increase"
+                        data-cart-source="menu"
+                        data-index="{{ loop.index0 }}"
+                        aria-label="เพิ่มจำนวน"
+                    >
+                        ＋
+                    </button>
+
+                    <button
+                        type="button"
+                        class="remove-link"
+                        data-cart-action="remove"
+                        data-cart-source="menu"
+                        data-index="{{ loop.index0 }}"
+                    >
+                        ลบ
+                    </button>
+
+                </div>
+
+            </article>
+
+            {% endfor %}
+
+        {% else %}
+
+            <div class="empty-state">
+
+                <span class="decorative-mark" aria-hidden="true"></span>
+
+                <h2>ยังไม่มีเครื่องดื่มในตะกร้า</h2>
+
+                <p>ลองเลือกเมนูที่เข้ากับวันนี้ของคุณดูนะ</p>
+
+                <a class="button button-dark" href="{{ url_for('menu') }}">
+                    ไปเลือกเมนู ↗
+                </a>
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+    <aside class="cart-summary">
+
+        <p class="eyebrow">ORDER SUMMARY</p>
+
+        <h2>สรุปออร์เดอร์</h2>
+
+        <div class="summary-line">
+            <span>{{ (cart | sum(attribute='quantity'))|number(0) }} แก้ว</span>
+            <span>{{ total|number(0) }} ฿</span>
+        </div>
+
+        <div class="summary-total">
+            <span>ยอดรวม (รวม VAT 7%)</span>
+
+            <strong>
+                {{ total|number(0) }}
+                <small>บาท</small>
+            </strong>
+        </div>
+
+        {% if cart %}
+
+            <form action="{{ url_for('confirm_order') }}" method="post">
+                <label class="cart-note-label" for="cart-note">ฝากข้อความถึงร้าน <small>(ไม่บังคับ)</small></label>
+                <textarea id="cart-note" name="note" rows="3" maxlength="240" placeholder="เช่น ไม่ใส่หลอด หรือต้องการอะไรเพิ่ม">{{ cart_note|default('') }}</textarea>
+
+                <button
+                    class="button button-dark button-wide"
+                    type="submit"
+                >
+                    ไปชำระเงิน ↗
+                </button>
+            </form>
+
+            <form
+                action="{{ url_for('clear_cart') }}"
+                method="post"
+                class="clear-form"
+            >
+                <input
+                    type="hidden"
+                    name="cart_source"
+                    value="menu"
+                >
+
+                <button class="text-link" type="submit">
+                    ล้างตะกร้า
+                </button>
+            </form>
+
+        {% endif %}
+
+    </aside>
+
+</section>
+
+{% endblock %}

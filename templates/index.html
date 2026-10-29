@@ -1,0 +1,134 @@
+
+{% extends 'base.html' %}
+
+{% block title %}
+Mood Café — พักใจในแบบของคุณ
+{% endblock %}
+
+{% block content %}
+
+<section class="landing-hero">
+    <div class="hero-copy">
+        <p class="eyebrow">
+            <i></i>
+            A LITTLE PAUSE, A BETTER MOOD
+        </p>
+
+        <h1 class="hero-title">
+            <span class="hero-title-brand">Mood Café</span>
+            <span class="hero-title-dash" aria-hidden="true">—</span>
+            <span class="hero-title-message">รสชาติที่พร้อมอยู่ข้างคุณ</span>
+            <em>ในทุกๆ วัน</em>
+        </h1>
+
+        <p class="lead">
+            เครื่องดื่มที่เลือกตามความรู้สึกของคุณ
+            เติมช่วงเวลาธรรมดาให้พิเศษขึ้นอีกนิด
+        </p>
+
+        <div class="hero-actions">
+            {% if username %}
+            <a class="button button-dark" href="{{ url_for('choose') }}">
+                เริ่มเลือกเครื่องดื่ม <span>↗</span>
+            </a>
+            {% else %}
+            <a class="button button-dark" href="{{ url_for('register') }}">
+                เริ่มต้นใช้งาน <span>↗</span>
+            </a>
+
+            <a class="text-link" href="{{ url_for('login') }}">
+                มีบัญชีแล้ว? เข้าสู่ระบบ
+            </a>
+            {% endif %}
+        </div>
+
+        <div class="hero-note">
+            <span class="decorative-mark" aria-hidden="true"></span>
+            เราชงอย่างตั้งใจ เพื่อวันที่ดีของคุณ
+        </div>
+    </div>
+
+    <div class="hero-scene">
+        <img
+            class="hero-photo"
+            src="{{ url_for('static', filename='images/cafe-interior.jpg', v='cafe-photo-1') }}"
+            alt="ภายในร้านกาแฟไม้บรรยากาศอบอุ่น"
+        >
+
+        <span class="shop-caption">
+            MOOD CAFÉ · COFFEE &amp; TEA
+        </span>
+    </div>
+</section>
+
+<section class="intro-strip">
+    <span>เลือกแก้วโปรดในแบบของคุณ</span>
+    <i></i>
+    <span>เครื่องดื่มดี ๆ เริ่มจากการฟังตัวเอง</span>
+</section>
+
+<section class="feature-grid">
+    <a
+        class="feature-card feature-pink"
+        href="{{ url_for('recommend_form') if username else url_for('login') }}"
+    >
+        <small>01 / FEEL</small>
+
+        <span class="decorative-mark" aria-hidden="true"></span>
+
+        <h2>เลือกตามอารมณ์</h2>
+
+        <p>
+            บอกความรู้สึกและงบของคุณ
+            แล้วให้เราช่วยหาเครื่องดื่มที่เข้ากับคุณ
+        </p>
+
+        <b>↗</b>
+    </a>
+
+    <a
+        class="feature-card feature-cream"
+        href="{{ url_for('menu') if username else url_for('login') }}"
+    >
+        <small>02 / MENU</small>
+
+        <span class="decorative-mark" aria-hidden="true"></span>
+
+        <h2>วันนี้อยากกินเมนูนี้</h2>
+
+        <p>
+            เลือกชา กาแฟ นม หรือผลไม้
+            ในแบบร้อน เย็น และปั่น
+        </p>
+
+        <b>↗</b>
+    </a>
+
+    <a
+        class="feature-card feature-lilac"
+        href="{{ url_for('track_order') if username else url_for('login') }}"
+    >
+        <small>03 / TRACK</small>
+
+        <span class="decorative-mark" aria-hidden="true"></span>
+
+        <h2>ติดตามได้ทุกแก้ว</h2>
+
+        <p>
+            ดูประวัติและสถานะออร์เดอร์ของคุณได้ในที่เดียว
+        </p>
+
+        <b>↗</b>
+    </a>
+</section>
+
+<section class="closing-note">
+    <span class="decorative-mark" aria-hidden="true"></span>
+
+    <p>
+        “บางวัน แค่ได้หยุดพักพร้อมเครื่องดื่มแก้วโปรด<br>
+        ก็เพียงพอแล้ว”
+    </p>
+</section>
+
+{% endblock %}

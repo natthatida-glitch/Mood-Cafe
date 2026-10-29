@@ -1,0 +1,60 @@
+Mood Café menu image sources
+
+The following menu images were matched to the user-provided, menu-named JPG files in static/images:
+drink-01.jpg | Thai Tea.jpg
+drink-02.jpg | Matcha Latte.jpg
+drink-03.jpg | Peach Tea.jpg
+drink-04.jpg | Earl Grey Tea.jpg
+drink-05.jpg | Honey Lemon Tea.jpg
+drink-06.jpg | ชาหอมหมื่นลี้.jpg
+drink-07.jpg | มัทฉะสตรอว์เบอร์รี.jpg
+drink-08.jpg | Latte.jpg
+drink-09.jpg | Americano.jpg
+drink-10.jpg | Cappuccino.jpg
+drink-11.jpg | Caramel Macchiato.jpg
+drink-12.jpg | Mocha.jpg
+drink-13.jpg | Espresso.jpg
+drink-14.jpg | Caramel Latte.jpg
+drink-15.jpg | Hazelnut Latte.jpg
+drink-16.jpg | White Chocolate Mocha.jpg
+drink-17.jpg | Affogato.jpg
+drink-18.jpg | Cold Brew.jpg
+drink-19.jpg | Signature Coffee.jpg
+drink-20.jpg | Strawberry Milk.jpg
+drink-21.jpg | Cocoa.jpg
+drink-22.jpg | Vanilla Milk.jpg
+drink-23.jpg | Taro Milk.jpg
+drink-24.jpg | Chocolate Milkshake.jpg
+drink-25.jpg | คาราเมลนมสด.jpg
+drink-26.jpg | Hojicha Latte.jpg
+drink-27.jpg | Ube Matcha.jpg
+drink-28.jpg | Rose Tea.jpg
+drink-29.jpg | Premium Dark Matcha.jpg
+drink-30.jpg | Thai Tea Cream Cheese.jpg
+drink-31.jpg | Strawberry Matcha Cream.jpg
+drink-32.jpg | Honey Milk.jpg
+drink-33.jpg | Brown Sugar Milk.jpg
+drink-34.jpg | Pistachio Milk.jpg
+drink-35.jpg | Dark Chocolate.jpg
+drink-36.jpg | Chocolate Mint.jpg
+drink-37.jpg | Premium Chocolate Frappe.jpg
+drink-38.jpg | Gold Matcha Latte.jpg
+drink-39.jpg | Caramel Crown Frappe.jpg
+drink-40.jpg | Strawberry Cheesecake Frappe.jpg
+drink-41.jpg | Pistachio Chocolate Frappe.jpg
+drink-42.jpg | Mood Luxury Frappe.jpg
+drink-43.jpg | Strawberry Soda.jpg
+drink-44.jpg | Blue Lemon Soda.jpg
+drink-45.jpg | Passion Fruit Soda.jpg
+drink-46.jpg | Kiwi Lime Soda.jpg
+drink-47.jpg | Mixed Berry Smoothie.jpg
+drink-48.jpg | Lychee Soda.jpg
+drink-49.jpg | Mango Smoothie.jpg
+drink-50.jpg | Strawberry Yogurt Smoothie.jpg
+
+No matching menu-named file was present for the items below; their existing Pexels fallback images remain in place:
+drink-51.jpg  |  Peach Yuzu Soda
+drink-52.jpg  |  Tropical Fruit Smoothie
+drink-53.jpg  |  Premium Berry Smoothie
+
+Updated drink-29.jpg with the latest user-provided Premium Dark Matcha.jpg.

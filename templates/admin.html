@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block title %}จัดการร้าน | Mood Café{% endblock %}
+
+{% block content %}
+<section class="page-heading compact">
+    <p class="eyebrow">MOOD CAFÉ / ADMIN</p>
+    <h1>จัดการร้าน</h1>
+    <p>ภาพรวมของร้านMood Cafeของเรา อัปเดตเมนูและสถานะออเดอร์ของคุณลูกค้าที่รัก</p>
+</section>
+
+{% set active_admin_page = 'overview' %}
+{% include '_admin_nav.html' %}
+
+<section class="admin-stats">
+    <article>
+        <small>ออร์เดอร์ทั้งหมด</small>
+        <strong>{{ order_count|number(0) }}</strong>
+    </article>
+
+    <article>
+        <small>ยอดขายวันนี้</small>
+        <strong>{{ sales_today|number(0) }} ฿</strong>
+    </article>
+
+    <article>
+        <small>ยอดขายสัปดาห์นี้</small>
+        <strong>{{ sales_week|number(0) }} ฿</strong>
+    </article>
+
+    <article>
+        <small>ยอดขายเดือนนี้</small>
+        <strong>{{ sales_month|number(0) }} ฿</strong>
+    </article>
+
+    <article>
+        <small>ยอดขายปีนี้</small>
+        <strong>{{ sales_year|number(0) }} ฿</strong>
+    </article>
+
+    <article>
+        <small>ยอดขายสะสมทั้งหมด</small>
+        <strong>{{ revenue|number(0) }} ฿</strong>
+    </article>
+
+    <article>
+        <small>สมาชิก</small>
+        <strong>{{ customer_count|number(0) }} คน</strong>
+    </article>
+    <article>
+        <small>เมนูที่เปิดขาย</small>
+        <strong>{{ active_count|number(0) }} / {{ menu_count|number(0) }}</strong>
+    </article>
+</section>
+
+<section class="admin-shortcuts">
+    <a href="{{ url_for('admin_menu') }}">
+        <span>MENU MANAGEMENT</span>
+        <strong>จัดการเมนูเครื่องดื่ม</strong>
+        <small>เพิ่ม แก้ไข เปลี่ยนรูปภาพ หรือปิดขายเมนู</small>
+        <b>เปิดหน้าจัดการเมนู ↗</b>
+    </a>
+
+    <a href="{{ url_for('admin_orders') }}">
+        <span>
+            ORDER MANAGEMENT
+            {% if pending_order_count %}
+                · {{ pending_order_count|number(0) }} รายการรอตรวจ
+            {% endif %}
+        </span>
+        <strong>ติดตามออร์เดอร์</strong>
+        <small>ตรวจสลิป ยืนยันชำระเงิน และอัปเดตสถานะ</small>
+        <b>เปิดหน้าติดตามออร์เดอร์ ↗</b>
+    </a>
+    <a href="{{ url_for('admin_sales') }}">
+        <span>SALES REPORT</span>
+        <strong>รายงานยอดขาย</strong>
+        <small>ดูรายการและยอดขายแยกตามวัน เดือน หรือปี</small>
+        <b>เปิดรายงานยอดขาย ↗</b>
+    </a>
+    <a href="{{ url_for('admin_customers') }}">
+        <span>CUSTOMER HISTORY</span>
+        <strong>ข้อมูลและประวัติลูกค้า</strong>
+        <small>{{ customer_count|number(0) }} สมาชิก และประวัติการซื้อ</small>
+        <b>เปิดข้อมูลลูกค้า ↗</b>
+    </a>
+</section>
+{% endblock %} 

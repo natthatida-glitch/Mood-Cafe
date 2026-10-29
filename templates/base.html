@@ -1,0 +1,155 @@
+
+<!doctype html>
+<html lang="th">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f4eadb">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <title>
+        {% block title %}Mood Café{% endblock %}
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css', v='mood-nav-type-match-20261027') }}"
+    >
+
+    <script
+        src="{{ url_for('static', filename='js/ui.js', v='mood-logout-modal-20261026') }}"
+        defer
+    ></script>
+</head>
+
+<body id="top">
+
+    {% set site_count = (session.get('cart', []) | sum(attribute='quantity')) + (session.get('recommend_cart', []) | sum(attribute='quantity')) %}
+
+    <header class="topbar">
+
+        <a class="brand" href="{{ url_for('home') }}">
+            <img
+                class="brand-logo"
+                src="{{ url_for('static', filename='images/mood-cafe-logo-warm.png', v='mood-logo-warm-20261014') }}"
+                alt="Mood Café"
+            >
+
+            <span>
+                <small>เลือกเครื่องดื่มให้เข้ากับความรู้สึกของคุณกันค่ะ</small>
+            </span>
+        </a>
+
+        <nav class="main-nav" aria-label="เมนูหลัก">
+
+            {% if session.get('user_id') %}
+
+            <a class="{{ 'is-current' if request.endpoint == 'choose' else '' }}" href="{{ url_for('choose') }}" {% if request.endpoint == 'choose' %}aria-current="page"{% endif %}>เริ่มต้น</a>
+            <a class="{{ 'is-current' if request.endpoint == 'menu' else '' }}" href="{{ url_for('menu') }}" {% if request.endpoint == 'menu' %}aria-current="page"{% endif %}>เมนู</a>
+            {% if not session.get('is_admin') %}
+            <a class="{{ 'is-current' if request.endpoint in ['loyalty_rewards', 'loyalty_reward_menu'] else '' }}" href="{{ url_for('loyalty_rewards') }}" {% if request.endpoint in ['loyalty_rewards', 'loyalty_reward_menu'] %}aria-current="page"{% endif %}><span class="loyalty-nav-cup" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M10 17h25v13a9 9 0 0 1-9 9h-7a9 9 0 0 1-9-9V17Z"/><path d="M35 20h3a5 5 0 0 1 0 10h-4M15 11c0-3 4-3 4-6m5 6c0-3 4-3 4-6M8 42h31"/></svg></span>สะสมแต้ม</a>
+            {% endif %}
+            <a class="{{ 'is-current' if request.endpoint == 'order_history' else '' }}" href="{{ url_for('order_history') }}" {% if request.endpoint == 'order_history' %}aria-current="page"{% endif %}>{{ 'ออร์เดอร์' if session.get('is_admin') else 'ประวัติคำสั่งซื้อ' }}</a>
+            <a class="{{ 'is-current' if request.endpoint == 'track_order' else '' }}" href="{{ url_for('track_order') }}" {% if request.endpoint == 'track_order' %}aria-current="page"{% endif %}>ติดตาม</a>
+
+            {% if session.get('is_admin') %}
+            <a class="{{ 'is-current' if request.endpoint and request.endpoint.startswith('admin_') else '' }}" href="{{ url_for('admin_dashboard') }}" {% if request.endpoint and request.endpoint.startswith('admin_') %}aria-current="page"{% endif %}>จัดการร้าน</a>
+            {% endif %}
+
+            <a class="nav-cart {{ 'is-current' if request.endpoint == 'view_cart' else '' }}" href="{{ url_for('view_cart') }}" {% if request.endpoint == 'view_cart' %}aria-current="page"{% endif %}>
+                ตะกร้า
+                <span data-cart-count>{{ site_count|number(0) }}</span>
+            </a>
+
+            <button class="nav-quiet logout-open-button" type="button" data-open-logout aria-haspopup="dialog" aria-controls="logout-confirm-dialog">
+                ออกจากระบบ
+            </button>
+
+            {% else %}
+
+            <a class="{{ 'is-current' if request.endpoint == 'login' else '' }}" href="{{ url_for('login') }}" {% if request.endpoint == 'login' %}aria-current="page"{% endif %}>เข้าสู่ระบบ</a>
+
+            <a class="nav-cta {{ 'is-current' if request.endpoint == 'register' else '' }}" href="{{ url_for('register') }}" {% if request.endpoint == 'register' %}aria-current="page"{% endif %}>
+                สมัครสมาชิก ↗
+            </a>
+
+            {% endif %}
+
+        </nav>
+
+    </header>
+
+    <main class="site-main">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-main">
+            <section class="footer-column footer-about" aria-labelledby="footer-about-title">
+                <div class="footer-brand">
+                    <img
+                        class="footer-logo"
+                        src="{{ url_for('static', filename='images/mood-cafe-logo-warm.png', v='mood-logo-warm-20261014') }}"
+                        alt=""
+                        loading="lazy"
+                    >
+                    <h2 id="footer-about-title">เกี่ยวกับเรา</h2>
+                </div>
+                <p>ร้าน Mood Café ของเรานั้น อร่อย สด สะอาด อย่าบอกใคร ร้านเราใส่ใจมาก ๆ ชงสดใหม่ทีละแก้วทุกออเดอร์ มาลองกันได้ค่ะ เรายินดีต้อนรับลูกค้าที่รักของเราเสมอค่ะ</p>
+            </section>
+
+            <section class="footer-column" aria-labelledby="footer-hours-title">
+                <p class="footer-kicker">MADE FRESH FOR YOU</p>
+                <h2 id="footer-hours-title">เวลาเปิด–ปิด</h2>
+                <p class="footer-hours">09.00–23.00 น.</p>
+                <p>เครื่องดื่มทุกแก้วชงสดใหม่เมื่อได้รับออเดอร์ พร้อมดูแลด้วยความใส่ใจ</p>
+                <a class="footer-link" href="{{ url_for('menu') if session.get('user_id') else url_for('login') }}">เลือกเครื่องดื่มแก้วโปรด <span aria-hidden="true">↗</span></a>
+            </section>
+
+            <section class="footer-column footer-contact" aria-labelledby="footer-contact-title">
+                <p class="footer-kicker">SAY HELLO</p>
+                <h2 id="footer-contact-title">ติดต่อเรา</h2>
+                <a href="tel:0637743280"><span>โทร</span><strong>063-7743280</strong></a>
+                <a href="mailto:nattatidahotarat@gmail.com"><span>Email</span><strong>nattatidahotarat@gmail.com</strong></a>
+            </section>
+        </div>
+
+        <div class="footer-bottom">
+            <span>Copyright {{ current_year }} © Mood Café</span>
+            <a href="#top">กลับขึ้นด้านบน <span aria-hidden="true">↑</span></a>
+        </div>
+    </footer>
+
+    {% if session.get('user_id') %}
+    <div class="logout-modal-backdrop" data-logout-modal hidden>
+        <section class="logout-modal" id="logout-confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="logout-modal-title" aria-describedby="logout-modal-copy" tabindex="-1">
+            <button class="logout-modal-close" type="button" data-close-logout aria-label="ปิดหน้าต่าง">×</button>
+            <span class="logout-modal-mark" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M18 10H10v28h8M25 15l10 9-10 9M35 24H17"/></svg></span>
+            <p class="eyebrow">MOOD CAFÉ / SIGN OUT</p>
+            <h2 id="logout-modal-title">ต้องการออกจากระบบไหมคะ?</h2>
+            <p id="logout-modal-copy">ยืนยันเพื่อออกจากบัญชีของคุณ คุณสามารถกลับมาเข้าสู่ระบบได้ทุกเมื่อค่ะ</p>
+            <div class="logout-modal-actions">
+                <button class="button button-outline" type="button" data-close-logout>ขออยู่ต่อ</button>
+                <form action="{{ url_for('logout') }}" method="post"><button class="button button-dark" type="submit">ยืนยันออกจากระบบ</button></form>
+            </div>
+        </section>
+    </div>
+    {% endif %}
+
+    <div
+        class="toast"
+        role="status"
+        aria-live="polite"
+        data-toast
+    ></div>
+
+</body>
+</html>
+
+
+
+
+
