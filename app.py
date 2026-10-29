@@ -388,8 +388,12 @@ DRINKS = [
 
 # สร้างรหัสรูปภาพของแต่ละเมนู
 MENU_IMAGE_KEYS = {
-    item["name"]: f"drink-{index:02d}"
-    for index, item in enumerate(DRINKS, 1)
+    item["name"]: {
+        "Peach Yuzu Soda": "Peach Tea",
+        "Tropical Fruit Smoothie": "Mango Smoothie",
+        "Premium Berry Smoothie": "Mixed Berry Smoothie",
+    }.get(item["name"], item["name"])
+    for item in DRINKS
 }
 
 
@@ -486,7 +490,7 @@ def seed_menu_items():
         if count == 0:
             conn.executemany(
                 "INSERT INTO menu_items (name,category,emoji,prices_json,moods_json,active,updated_at) VALUES (?,?,?,?,?,1,?)",
-                [(d["name"], d["category"], d.get("emoji", ""), json.dumps(d["prices"], ensure_ascii=False), json.dumps(d["moods"], ensure_ascii=False), datetime.now().isoformat(timespec="seconds")) for d in DRINKS]
+                [(d["name"], d["category"], d["emoji"], json.dumps(d["prices"], ensure_ascii=False), json.dumps(d["moods"], ensure_ascii=False), datetime.now().isoformat(timespec="seconds")) for d in DRINKS]
             )
 
 
@@ -1024,8 +1028,13 @@ def receipt_template_values(order, pdf_mode=False):
             "rejected": "สลิปไม่ผ่านการตรวจสอบ",
         }.get(order.get("payment_status"), order.get("payment_status") or "ไม่ระบุ")
     )
+    note_text = str(order.get("note") or "")
+    item_count = max(1, len(order.get("items") or []))
+    note_lines = (len(note_text) + 39) // 40 if note_text else 0
+    receipt_page_height_mm = 118 + item_count * 12 + note_lines * 4
     return {
         "order": order,
+        "receipt_page_height_mm": receipt_page_height_mm,
         "receipt_number": order["receipt_number"],
         "customer_name": order["customer_name"],
         "logo_data_uri": logo_data_uri,
@@ -1997,10 +2006,7 @@ def verify_email():
                     conn.execute("UPDATE users SET email_verified = 1 WHERE id = ?", (user["id"],))
                     conn.execute("DELETE FROM email_verification_codes WHERE email = ?", (email,))
                     session.clear()
-                    session["user_id"] = user["id"]
-                    session["username"] = user["username"]
-                    session["is_admin"] = user["is_admin"]
-                    return redirect(url_for("choose"))
+                    return redirect(url_for("login", verified="1"))
 
     return render_template(
         "verify_email.html", email=email, message=message,
@@ -2103,7 +2109,7 @@ def register():
 @app.route("/login", methods=["GET", "POST"])
 def login():
     is_ajax = request.headers.get("X-Requested-With") == "XMLHttpRequest"
-    message = ""
+    message = "ยืนยันอีเมลสำเร็จแล้ว กรุณาเข้าสู่ระบบค่ะ" if request.args.get("verified") == "1" else ""
 
     if request.method == "POST":
         email = request.form.get("email", "").strip().lower()
