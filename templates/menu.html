@@ -12,7 +12,8 @@
     <div class="menu-item-top">
         <div class="menu-photo">
             <span class="menu-photo-fallback">{{ category_names.get(drink.category, drink.category) }}</span>
-            <img src="{{ menu_image_urls.get(drink.name) or url_for('static', filename='images/menu/' ~ menu_image_keys.get(drink.name, 'menu-default') ~ '.jpg', v='menu-set-20261014-userphotos') }}" alt="{{ drink.name }}" loading="lazy" onerror="this.remove()" onload="this.parentElement.classList.add('has-image')">
+            {% set fallback_image = url_for('static', filename='images/' ~ menu_image_keys.get(drink.name, drink.name) ~ '.jpg', v='menu-set-20261014-userphotos') %}
+            <img src="{{ menu_image_urls.get(drink.name) or fallback_image }}" data-fallback="{{ fallback_image }}" alt="{{ drink.name }}" loading="lazy" onerror="if (!this.dataset.fallbackTried) { this.dataset.fallbackTried = '1'; this.src = this.dataset.fallback; } else { this.remove(); }" onload="this.parentElement.classList.add('has-image')">
         </div>
         <span class="price-range">เริ่ม {{ (drink.prices.values()|min)|number(0) }} ฿ <small>รวม VAT 7%</small></span>
     </div>
