@@ -486,7 +486,7 @@ def seed_menu_items():
         if count == 0:
             conn.executemany(
                 "INSERT INTO menu_items (name,category,emoji,prices_json,moods_json,active,updated_at) VALUES (?,?,?,?,?,1,?)",
-                [(d["name"], d["category"], d["emoji"], json.dumps(d["prices"], ensure_ascii=False), json.dumps(d["moods"], ensure_ascii=False), datetime.now().isoformat(timespec="seconds")) for d in DRINKS]
+                [(d["name"], d["category"], d.get("emoji", ""), json.dumps(d["prices"], ensure_ascii=False), json.dumps(d["moods"], ensure_ascii=False), datetime.now().isoformat(timespec="seconds")) for d in DRINKS]
             )
 
 
