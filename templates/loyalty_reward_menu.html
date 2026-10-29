@@ -16,7 +16,7 @@
             <div class="menu-item-top">
                 <div class="menu-photo">
                     <span class="menu-photo-fallback">MENU</span>
-                    <img src="{{ menu_image_urls.get(drink.name) or url_for('static', filename='images/menu/' ~ menu_image_keys.get(drink.name, 'menu-default') ~ '.jpg', v='menu-set-20261014-userphotos') }}" alt="{{ drink.name }}" loading="lazy" onerror="this.remove()" onload="this.parentElement.classList.add('has-image')">
+                    <img src="{{ menu_image_urls.get(drink.name) or url_for('static', filename='images/' ~ menu_image_keys.get(drink.name, drink.name) ~ '.jpg', v='menu-set-20261014-userphotos') }}" data-fallback="{{ url_for('static', filename='images/' ~ menu_image_keys.get(drink.name, drink.name) ~ '.jpg', v='menu-set-20261014-userphotos') }}" alt="{{ drink.name }}" loading="lazy" onerror="if (!this.dataset.fallbackTried) { this.dataset.fallbackTried = '1'; this.src = this.dataset.fallback; } else { this.remove(); }" onload="this.parentElement.classList.add('has-image')">
                 </div>
                 {% if drink.eligible_prices %}<span class="reward-price-tag">รับฟรี</span>{% else %}<span class="reward-lock-tag">เกิน 100 ฿</span>{% endif %}
             </div>
