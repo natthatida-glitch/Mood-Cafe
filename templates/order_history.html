@@ -51,11 +51,13 @@
 
                     <span class="menu-photo-fallback">MENU</span>
 
+                    {% set fallback_image = url_for('static', filename='images/' ~ menu_image_keys.get(item.name, item.name) ~ '.jpg', v='menu-set-20261014-userphotos') %}
                     <img
-                        src="{{ menu_image_urls.get(item.name) or url_for('static', filename='images/menu/' ~ menu_image_keys.get(item.name, 'menu-default') ~ '.jpg', v='menu-set-20261014-userphotos') }}"
+                        src="{{ menu_image_urls.get(item.name) or fallback_image }}"
+                        data-fallback="{{ fallback_image }}"
                         alt="{{ item.name }}"
                         loading="lazy"
-                        onerror="this.remove()"
+                        onerror="if (!this.dataset.fallbackTried) { this.dataset.fallbackTried = '1'; this.src = this.dataset.fallback; } else { this.remove(); }"
                         onload="this.parentElement.classList.add('has-image')"
                     >
 
