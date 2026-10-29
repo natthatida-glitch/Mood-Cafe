@@ -1,0 +1,8 @@
+{
+  "smtp_host": "smtp.gmail.com",
+  "smtp_port": "587",
+  "security": "STARTTLS",
+  "username": "nattatidahotarat@gmail.com",
+  "password": "bwuzfjwynxxfnhxa",
+  "sender_name": "Mood Cafe"
+}
